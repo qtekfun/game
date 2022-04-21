@@ -34,6 +34,7 @@ C       := gcc
 MKDIR   := mkdir -p
 SRC     := src
 OBJ     := obj
+BIN     := bin
 RMF     := rm -rf
 CLEAN   := clean
 LIBS    := -lX11
@@ -48,12 +49,12 @@ ALLCS      := $(shell find src -type f -iname *.c)
 ALLOBJ := $(foreach F,$(ALLCPPS) $(ALLCS),$(call C2O,$(F)))
 #ALLCSOBJ   := $(patsubst %.c,%.o,$(ALLCS))
 SUBDIRS    := $(shell find $(SRC) -type d)
-OBJSUBDIRS := $(patsubst $(SRC)%,$(OBJ)%,$(SUBDIRS))
+OBJSUBDIRS := $(patsubst $(SRC)%,$(OBJ)%,$(SUBDIRS)) $(BIN)
 
 .PHONY  := info
 
-$(APP) : $(OBJSUBDIRS) $(ALLOBJ)
-	$(CC) -o $(APP) $(ALLOBJ) $(LIBS)
+$(BIN)/$(APP) : $(OBJSUBDIRS) $(ALLOBJ)
+	$(CC) -o $(BIN)/$(APP) $(ALLOBJ) $(LIBS)
 
 # Generate rules for all objects
 $(foreach F,$(ALLCPPS),$(eval $(call COMPILE,$(CC),$(call C2O,$(F)),$(F),$(call C2H,$(F)),$(CCFLAGS))))
