@@ -41,6 +41,17 @@ LIBS    := -lX11
 
 #LIBS := -L. -lX11 L = path and -l lib to use
 
+# make CC=clang++ C=clang -> to use clang once instead of gcc
+
+# make DEBUG=1
+ifdef DEBUG
+	CCFLAGS += -g
+	CFLAGS += -g
+else
+	CCFLAGS += -O3
+	CFLAGS += -O3
+endif
+
 #iname = case insensitive
 #subst substituye texto plano. patsubst substituye con un patron.
 ALLCPPS    := $(shell find src -type f -iname *.cpp)
