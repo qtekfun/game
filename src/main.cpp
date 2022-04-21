@@ -1,5 +1,5 @@
 extern "C" {
-    #include "tinyPTC/tinyptc.h"
+    #include <tinyPTC/src/tinyptc.h>
 }
 #include <cstdint>
 

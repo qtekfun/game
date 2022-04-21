@@ -25,12 +25,15 @@ endef
 ###########################################
 ### CONFIG
 ###########################################
-APP     := game
-CCFLAGS := -Wall -pedantic -std=c++17
+APP     := libtinyptc.a
+CCFLAGS := -Wall -pedantic
 CFLAGS  := -Wall -pedantic
 CC      := g++
 CC      := g++
 C       := gcc
+AR      := ar
+RANLIB  := ranlib
+ARFLAGS := -crs
 MKDIR   := mkdir -p
 SRC     := src
 OBJ     := obj
@@ -39,9 +42,6 @@ RMF     := rm -rf
 RM      := rm
 CLEAN   := clean
 CLEANALL:= cleanall
-LIBS    := lib/picoPNG.ua/bin/libpicopng.a lib/tinyPTC/bin/libtinyptc.a -lX11
-LIBDIR  := lib
-INCDIRS := -I$(SRC) -I$(LIBDIR)
 
 #LIBS := -L. -lX11 L = path and -l lib to use
 
@@ -66,14 +66,16 @@ ALLOBJ := $(foreach F,$(ALLCPPS) $(ALLCS),$(call C2O,$(F)))
 SUBDIRS    := $(shell find $(SRC) -type d)
 OBJSUBDIRS := $(patsubst $(SRC)%,$(OBJ)%,$(SUBDIRS)) $(BIN)
 
-.PHONY  := info libs libs-clean libs-cleanall
+.PHONY  := info
 
+# Generate Library
 $(BIN)/$(APP) : $(OBJSUBDIRS) $(ALLOBJ)
-	$(CC) -o $(BIN)/$(APP) $(ALLOBJ) $(LIBS)
+	$(AR) $(ARFLAGS) $(BIN)/$(APP) $(ALLOBJ)
+	$(RANLIB) $(BIN)/$(APP)
 
 # Generate rules for all objects
-$(foreach F,$(ALLCPPS),$(eval $(call COMPILE,$(CC),$(call C2O,$(F)),$(F),$(call C2H,$(F)),$(CCFLAGS) $(INCDIRS))))
-$(foreach F,$(ALLCS),$(eval $(call COMPILE,$(C),$(call C2O,$(F)),$(F),$(call C2H,$(F)),$(CFLAGS) $(INCDIRS))))
+$(foreach F,$(ALLCPPS),$(eval $(call COMPILE,$(CC),$(call C2O,$(F)),$(F),$(call C2H,$(F)),$(CCFLAGS))))
+$(foreach F,$(ALLCS),$(eval $(call COMPILE,$(C),$(call C2O,$(F)),$(F),$(call C2H,$(F)),$(CFLAGS))))
 
 # $(OBJ)%.o : $(SRC)%.c
 # 	$(C) -o $(patsubst $(SRC)%, $(OBJ)%, $@) -c $^ $(CFLAGS)
@@ -100,14 +102,3 @@ clean:
 
 cleanall: clean
 	$(RM) -r "./$(BIN)/$(APP)"
-
-## LIB rules
-libs:
-	$(MAKE) -C $(LIBDIR)
-
-libs-clean:
-	$(MAKE) -C $(LIBDIR) clean
-
-libs-cleanall:
-	$(MAKE) -C $(LIBDIR) cleanall
-
