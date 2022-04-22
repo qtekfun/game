@@ -3,6 +3,7 @@ extern "C" {
 }
 #include <cstdint>
 #include <iostream>
+#include <memory> //std::unique_ptr
 
 constexpr uint32_t kR = 0x00FF00000;
 constexpr uint32_t kG = 0x0000FF000;
@@ -18,28 +19,35 @@ constexpr u_int32_t sprite[8*8] = {
 constexpr uint32_t kSCRWIDTH  { 640 };
 constexpr uint32_t kSCRHEIGHT { 360 };
 
-struct Screen_t {
+// struct Screen_t {
 
-    Screen_t(uint32_t w, uint32_t h) : screen(new uint32_t[w*h]) {}
-    ~Screen_t() {
-        std::cout << "Paso? \n";
-        delete [] screen;
-    }
+//     Screen_t(uint32_t w, uint32_t h) : screen(new uint32_t[w*h]) {}
+//     ~Screen_t() {
+//         std::cout << "Paso? \n";
+//         delete [] screen;
+//     }
 
-    uint32_t * screen {nullptr};
-};
+//     uint32_t * screen {nullptr};
+// };
 
 void execute(){
     ptc_open("window", kSCRWIDTH, kSCRHEIGHT);
 
-    Screen_t scr (kSCRWIDTH, kSCRHEIGHT);
+    //std::unique_ptr<uint32_t[]> screen = std::make_unique<uint32_t[]>(kSCRWIDTH * kSCRHEIGHT);
+    // Screen_t scr (kSCRWIDTH, kSCRHEIGHT);  Del struct de arriba
+    // using Screen_t = std::unique_ptr<uint32_t[]>;
+    // Screen_t screen = std::make_unique<uint32_t[]>(kSCRWIDTH * kSCRHEIGHT);
+    // auto screen = std::make_unique<uint32_t[]>(kSCRWIDTH * kSCRHEIGHT);
+    // auto screen { std::make_unique<uint32_t[]> (kSCRWIDTH * kSCRHEIGHT) };
+
+    auto screen = std::make_unique<uint32_t[]>(kSCRWIDTH * kSCRHEIGHT);
 
     for (;;) {
         for (u_int32_t i=0; i < 640*360; ++i) {
-            scr.screen[i] = kR;
+            screen[i] = kR;
         }
         
-        u_int32_t *pscr = scr.screen;
+        u_int32_t *pscr = screen.get();
         const u_int32_t *psprt = sprite;
 
         for (u_int32_t i=0; i < 4; ++i) {
@@ -51,9 +59,9 @@ void execute(){
             pscr += 640 - 4;
         }
         
-        throw "Exception";
+        //throw "Exception";
 
-        ptc_update(scr.screen);
+        ptc_update(screen.get());
     }
     
     ptc_close();
